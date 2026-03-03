@@ -14,5 +14,10 @@
         <p>
             {{ \Illuminate\Support\Str::limit(strip_tags($post->content), 120) }}
         </p>
+        @if(isset($post->relevance))
+            <small class="text-success">
+                Score: {{ number_format($post->relevance, 2) }}
+            </small>
+        @endif
     </div>
 </div>

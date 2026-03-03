@@ -15,23 +15,38 @@ class PostController extends Controller
     /**
      * Display list of posts (optimized)
      */
+
     public function index()
     {
         try {
 
-            $query = Post::with(['user', 'categories', 'tags'])
-                ->latest();
+            $query = Post::with('user');
 
             if (request()->filled('search')) {
-                $query->where('title', 'like', '%' . request('search') . '%');
+
+                $search = request('search');
+
+                $query->select('*')
+                    ->selectRaw(
+                        "MATCH(title, content) AGAINST (? IN NATURAL LANGUAGE MODE) as relevance",
+                        [$search]
+                    )
+                    ->whereRaw(
+                        "MATCH(title, content) AGAINST (? IN NATURAL LANGUAGE MODE)",
+                        [$search]
+                    )
+                    ->orderByDesc('relevance');
+
+            } else {
+                $query->latest();
             }
 
             $posts = $query->paginate(10)->withQueryString();
 
             return view('posts.index', compact('posts'));
 
-        } catch (Exception $e) {
-            return back()->with('error', 'Gagal mengambil data post');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Search gagal');
         }
     }
 
