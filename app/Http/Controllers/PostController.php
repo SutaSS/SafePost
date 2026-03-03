@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Artesaos\SEOTools\Facades\SEOTools;
 use Exception;
 
 class PostController extends Controller
@@ -43,6 +44,17 @@ class PostController extends Controller
             $post = Post::with('user')
                 ->where('slug', $slug)
                 ->firstOrFail();
+
+            // Dynamic SEO
+            SEOTools::setTitle($post->title);
+            SEOTools::setDescription(Str::limit(strip_tags($post->content), 160));
+            SEOTools::opengraph()->setUrl(url()->current());
+            SEOTools::opengraph()->addProperty('type', 'article');
+            SEOTools::twitter()->setSite('@SafePost');
+            SEOTools::jsonLd()->setType('Article');
+            SEOTools::jsonLd()->addValue('headline', $post->title);
+            SEOTools::jsonLd()->addValue('author', $post->user->name);
+            SEOTools::jsonLd()->addValue('datePublished', $post->created_at);
 
             return view('posts.show', compact('post'));
 
