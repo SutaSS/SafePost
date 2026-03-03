@@ -4,6 +4,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\GoogleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\Tags\Url;
+use App\Models\Post;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +28,22 @@ Route::resource('posts', PostController::class);
 
 Route::middleware('auth')->group(function () {
     Route::resource('posts', PostController::class);
+});
+
+Route::get('/sitemap.xml', function () {
+
+    $sitemap = Sitemap::create();
+
+    $posts = Post::latest()->get();
+
+    foreach ($posts as $post) {
+        $sitemap->add(
+            Url::create("/posts/{$post->slug}")
+                ->setLastModificationDate($post->updated_at)
+        );
+    }
+
+    return $sitemap->toResponse(request());
 });
 
 require __DIR__.'/auth.php';

@@ -55,6 +55,7 @@ class PostController extends Controller
             SEOTools::jsonLd()->addValue('headline', $post->title);
             SEOTools::jsonLd()->addValue('author', $post->user->name);
             SEOTools::jsonLd()->addValue('datePublished', $post->created_at);
+            SEOTools::setCanonical(url()->current());
 
             return view('posts.show', compact('post'));
 
@@ -69,8 +70,8 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required'
+            'title' => 'required|string|min:10|max:255',
+            'content' => 'required|min:300',
         ]);
 
         try {
@@ -109,8 +110,8 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required'
+            'title' => 'required|string|min:10|max:255',
+            'content' => 'required|min:300',
         ]);
 
         try {
