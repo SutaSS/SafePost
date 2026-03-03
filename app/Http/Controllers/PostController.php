@@ -42,7 +42,12 @@ class PostController extends Controller
     {
         try {
 
-            $post = Post::with('user')
+            $post = Post::with([
+                'user',
+                'categories',
+                'tags',
+                'comments.user'
+            ])
                 ->where('slug', $slug)
                 ->firstOrFail();
 

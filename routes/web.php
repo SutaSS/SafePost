@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\GoogleController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 use App\Models\Post;
@@ -46,4 +47,14 @@ Route::get('/sitemap.xml', function () {
     return $sitemap->toResponse(request());
 });
 
+Route::middleware('auth')->group(function () {
+
+    Route::post('/posts/{post}/comments', 
+        [CommentController::class, 'store'])
+        ->name('comments.store');
+
+    Route::delete('/comments/{comment}', 
+        [CommentController::class, 'destroy'])
+        ->name('comments.destroy');
+});
 require __DIR__.'/auth.php';
