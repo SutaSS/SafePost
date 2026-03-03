@@ -15,4 +15,20 @@
     {!! nl2br(e($post->content)) !!}
 </div>
 
+<hr>
+
+<p>
+    Categories:
+    @foreach($post->categories as $category)
+        <span class="badge bg-primary">{{ $category->name }}</span>
+    @endforeach
+</p>
+
+<p>
+    Tags:
+    @foreach($post->tags as $tag)
+        <span class="badge bg-secondary">{{ $tag->name }}</span>
+    @endforeach
+</p>
+
 @endsection

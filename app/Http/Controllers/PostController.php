@@ -19,7 +19,8 @@ class PostController extends Controller
     {
         try {
 
-            $query = Post::with('user')->latest();
+            $query = Post::with(['user', 'categories', 'tags'])
+                ->latest();
 
             if (request()->filled('search')) {
                 $query->where('title', 'like', '%' . request('search') . '%');
@@ -70,8 +71,10 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|min:10|max:255',
-            'content' => 'required|min:300',
+            'title' => 'required|string|max:255',
+            'content' => 'required',
+            'categories' => 'array',
+            'tags' => 'array'
         ]);
 
         try {
@@ -84,12 +87,20 @@ class PostController extends Controller
                 $slug .= '-' . time();
             }
 
-            Post::create([
+            $post = Post::create([
                 'title' => $request->title,
                 'slug' => $slug,
                 'content' => $request->input('content'),
                 'user_id' => Auth::id(),
             ]);
+
+            if ($request->categories) {
+                $post->categories()->sync($request->categories);
+            }
+
+            if ($request->tags) {
+                $post->tags()->sync($request->tags);
+            }
 
             DB::commit();
 
