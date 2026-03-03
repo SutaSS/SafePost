@@ -18,9 +18,13 @@ class PostController extends Controller
     {
         try {
 
-            $posts = Post::with('user')
-                ->latest()
-                ->paginate(10);
+            $query = Post::with('user')->latest();
+
+            if (request()->filled('search')) {
+                $query->where('title', 'like', '%' . request('search') . '%');
+            }
+
+            $posts = $query->paginate(10)->withQueryString();
 
             return view('posts.index', compact('posts'));
 
