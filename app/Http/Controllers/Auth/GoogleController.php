@@ -21,9 +21,9 @@ class GoogleController extends Controller
             $googleUser = Socialite::driver('google')->user();
 
             $user = User::where('google_id', $googleUser->getId())
-                        ->orWhere('email', $googleUser->getEmail())
-                        ->first();
-    
+                ->orWhere('email', $googleUser->getEmail())
+                ->first();
+
             if (!$user) {
                 $user = User::create([
                     'name' => $googleUser->getName(),
@@ -39,12 +39,23 @@ class GoogleController extends Controller
                 ]);
             }
 
+            // Login user
             Auth::login($user);
 
+            // Clear 2FA verified session
+            session()->forget('2fa_verified');
+
+            // Jika 2FA aktif, arahkan ke verify form
+            if ($user->two_factor_enabled) {
+                return redirect()->route('2fa.verify.form');
+            }
+
+            // Jika 2FA tidak aktif, mark sebagai verified
+            session()->put('2fa_verified', true);
             return redirect()->route('dashboard');
 
         } catch (Exception $e) {
-            return redirect('/login')->with('error', 'Login gagal');
+            return redirect('/login')->with('error', 'Login gagal: ' . $e->getMessage());
         }
     }
 }

@@ -86,6 +86,14 @@ class PostController extends Controller
     }
 
     /**
+     * Show form to create new post
+     */
+    public function create()
+    {
+        return view('posts.create');
+    }
+
+    /**
      * Store new post
      */
     public function store(Request $request)
@@ -133,6 +141,19 @@ class PostController extends Controller
 
             return back()->with('error', 'Gagal membuat post');
         }
+    }
+
+    /**
+     * Show form to edit post
+     */
+    public function edit(Post $post)
+    {
+        // Ensure user owns the post
+        if (Auth::id() !== $post->user_id) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('posts.edit', compact('post'));
     }
 
     /**

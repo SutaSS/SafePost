@@ -12,6 +12,8 @@ use Illuminate\Notifications\Notifiable;
  * @property string $password
  * @property string|null $google_id
  * @property string|null $avatar
+ * @property string|null $two_factor_secret
+ * @property bool $two_factor_enabled
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -28,6 +30,8 @@ class User extends Authenticatable
         'password',
         'google_id',
         'avatar',
+        'two_factor_secret',
+        'two_factor_enabled',
     ];
 
     protected $hidden = [

@@ -22,13 +22,31 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
+
+
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        try {
 
-        $request->session()->regenerate();
+            $request->authenticate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+            $request->session()->regenerate();
+
+            $user = Auth::user();
+
+            // Reset 2FA session setiap login
+            session()->forget('2fa_verified');
+
+            // Jika 2FA aktif → redirect ke verify page
+            if ($user->two_factor_enabled) {
+                return redirect()->route('2fa.verify.form');
+            }
+
+            return redirect()->intended(route('dashboard'));
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Login gagal');
+        }
     }
 
     /**
@@ -36,6 +54,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+
+        session()->forget('2fa_verified');
+        
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
