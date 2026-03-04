@@ -114,15 +114,3 @@ Fitur:
 3. Verifikasi kode Google Authenticator
 4. Session `2fa_verified = true`
 5. Middleware mengizinkan akses
-
----
-
-# Kesimpulan
-
-SafePost adalah platform blog modern dengan:
-
-* 🔐 Enterprise-level security (OAuth + 2FA)
-* ⚡ Optimized & indexed database
-* 🔎 Advanced ranked search
-* 🌍 SEO ready
-* 🧱 Clean Laravel 12 architecture
