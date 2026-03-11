@@ -43,6 +43,14 @@ class PostController extends Controller
 
             $posts = $query->paginate(10)->withQueryString();
 
+            // SEO untuk index page
+            SEOTools::setTitle('Blog - SafePost');
+            SEOTools::setDescription('Discover amazing articles from our community. Read, share, and engage with SafePost blog.');
+            SEOTools::opengraph()->setUrl(url()->current());
+            SEOTools::opengraph()->addProperty('type', 'website');
+            SEOTools::twitter()->setSite('@SafePost');
+            SEOTools::setCanonical(route('posts.index'));
+
             return view('posts.index', compact('posts'));
 
         } catch (\Exception $e) {
